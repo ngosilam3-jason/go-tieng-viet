@@ -71,7 +71,6 @@ body {
 
 .char-correct {
     color: var(--success-color);
-    font-weight: 700;
 }
 
 .char-incorrect {
