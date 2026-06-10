@@ -41,7 +41,7 @@ window.PARAGRAPHS = [
     },
     {
         title: "Cho tôi xin một vé đi tuổi thơ, 2008",
-        text: "Tất cả những gì người lớn dạy dỗ đều đúng về mặt lý thuyết, bọn trẻ đều thấy vậy. Nhưng bọn chúng vẫn có một sự thôi thức vô hình làm cho khác đi trong thực tế."
+        text: "Tất cả những gì người lớn dạy dỗ đều đúng về mặt lý thuyết, bọn trẻ đều thấy vậy. Nhưng bọn chúng vẫn có một sự thôi thúc vô hình làm cho khác đi trong thực tế."
     },
     {
         title: "Tôi Thấy Hoa Vàng Trên Cỏ Xanh, 2010",

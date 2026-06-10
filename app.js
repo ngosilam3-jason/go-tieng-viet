@@ -142,7 +142,7 @@
             }
 
             if (wordIndex < completedWordCount) {
-                markCompletedWord(charElements, range, typedWord === expectedWord);
+                markCompletedWord(charElements, range, areWordsEqual(typedWord, expectedWord));
                 return;
             }
 
@@ -157,6 +157,11 @@
     }
 
     function markCurrentWord(charElements, range, typedWord) {
+        if (areWordsEqual(typedWord, range.word)) {
+            markCompletedWord(charElements, range, true);
+            return;
+        }
+
         for (let offset = 0; offset < range.word.length; offset += 1) {
             const span = charElements[range.start + offset];
             const typedChar = typedWord[offset];
@@ -201,11 +206,23 @@
     }
 
     function isTestComplete(inputValue) {
-        const expectedWordCount = getWords(state.currentText).length;
-        const typedWordCount = getWords(inputValue).length;
+        const expectedWords = getWords(state.currentText);
+        const typedWords = getWords(inputValue);
+        const expectedWordCount = expectedWords.length;
+        const typedWordCount = typedWords.length;
 
-        return inputValue.length >= state.currentText.length
-            || (inputValue.endsWith(" ") && typedWordCount >= expectedWordCount);
+        if (expectedWordCount === 0 || typedWordCount < expectedWordCount) {
+            return false;
+        }
+
+        const expectedLastWord = expectedWords[expectedWordCount - 1];
+        const typedLastWord = typedWords[expectedWordCount - 1];
+
+        if (hasTerminalPunctuation(expectedLastWord) && !hasTerminalPunctuation(typedLastWord)) {
+            return false;
+        }
+
+        return getComparisonLength(typedLastWord) >= getComparisonLength(expectedLastWord);
     }
 
     function handleTypingKeydown(event) {
@@ -249,9 +266,25 @@
             return 0;
         }
 
-        const correctWords = typedWords.filter((word, index) => word === expectedWords[index]).length;
+        const correctWords = typedWords.filter((word, index) => areWordsEqual(word, expectedWords[index])).length;
 
         return Math.round((correctWords / typedWords.length) * 100);
+    }
+
+    function areWordsEqual(typedWord, expectedWord) {
+        return normalizeWordForComparison(typedWord) === normalizeWordForComparison(expectedWord);
+    }
+
+    function normalizeWordForComparison(word) {
+        return String(word || "").normalize("NFC").replaceAll("…", "...");
+    }
+
+    function getComparisonLength(word) {
+        return Array.from(normalizeWordForComparison(word)).length;
+    }
+
+    function hasTerminalPunctuation(word) {
+        return /[.!?;:,]$/.test(normalizeWordForComparison(word));
     }
 
     function getWords(text) {
