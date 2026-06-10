@@ -114,33 +114,98 @@
 
         updateCharacterStatus(inputValue);
 
-        if (inputValue.length >= state.currentText.length) {
+        if (isTestComplete(inputValue)) {
             endTest();
         }
     }
 
     function updateCharacterStatus(inputValue) {
         const charElements = elements.textDisplay.querySelectorAll(".char-element");
+        const expectedRanges = getWordRanges(state.currentText);
+        const typedParts = inputValue.split(" ");
+        const currentWordIndex = typedParts.length - 1;
+        const completedWordCount = Math.max(typedParts.length - 1, 0);
 
-        charElements.forEach((span, index) => {
-            const expectedChar = state.currentText[index];
-            const typedChar = inputValue[index];
-
+        charElements.forEach((span) => {
             span.className = "char-element";
+        });
 
-            if (typedChar == null) {
-                if (index === inputValue.length) {
-                    span.classList.add("char-current");
+        expectedRanges.forEach((range, wordIndex) => {
+            const typedWord = typedParts[wordIndex];
+            const expectedWord = range.word;
+
+            if (typedWord == null) {
+                if (wordIndex === currentWordIndex) {
+                    charElements[range.start]?.classList.add("char-current");
                 }
                 return;
             }
 
-            if (typedChar === expectedChar) {
-                span.classList.add("char-correct");
-            } else {
-                span.classList.add("char-incorrect");
+            if (wordIndex < completedWordCount) {
+                markCompletedWord(charElements, range, typedWord === expectedWord);
+                return;
+            }
+
+            markCurrentWord(charElements, range, typedWord);
+        });
+    }
+
+    function markCompletedWord(charElements, range, isCorrect) {
+        for (let index = range.start; index < range.end; index += 1) {
+            charElements[index].classList.add(isCorrect ? "char-correct" : "char-incorrect");
+        }
+    }
+
+    function markCurrentWord(charElements, range, typedWord) {
+        for (let offset = 0; offset < range.word.length; offset += 1) {
+            const span = charElements[range.start + offset];
+            const typedChar = typedWord[offset];
+            const expectedChar = range.word[offset];
+
+            if (typedChar == null) {
+                if (offset === typedWord.length) {
+                    span.classList.add("char-current");
+                }
+                continue;
+            }
+
+            span.classList.add(typedChar === expectedChar ? "char-correct" : "char-incorrect");
+        }
+
+        if (typedWord.length > range.word.length) {
+            charElements[range.end - 1].classList.add("char-incorrect");
+        }
+    }
+
+    function getWordRanges(text) {
+        const ranges = [];
+        let start = null;
+
+        Array.from(text).forEach((char, index) => {
+            if (char !== " " && start == null) {
+                start = index;
+            }
+
+            if ((char === " " || index === text.length - 1) && start != null) {
+                const end = char === " " ? index : index + 1;
+                ranges.push({
+                    start,
+                    end,
+                    word: text.slice(start, end)
+                });
+                start = null;
             }
         });
+
+        return ranges;
+    }
+
+    function isTestComplete(inputValue) {
+        const expectedWordCount = getWords(state.currentText).length;
+        const typedWordCount = getWords(inputValue).length;
+
+        return inputValue.length >= state.currentText.length
+            || (inputValue.endsWith(" ") && typedWordCount >= expectedWordCount);
     }
 
     function handleTypingKeydown(event) {
