@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện gõ tiếng Việt</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="container">
+        <section class="main-panel" aria-label="Khu vực luyện gõ">
+            <div class="work-title" id="workTitle"></div>
+            <div class="text-display-box" id="textDisplay">Đang tải đoạn văn...</div>
+
+            <input
+                type="text"
+                class="input-box"
+                id="typingInput"
+                placeholder="Bắt đầu gõ ở đây..."
+                autocomplete="off"
+            >
+
+            <div class="result-container" id="resultContainer" aria-live="polite">
+                <div class="result-card" id="accuracyCard">Chính xác: 0%</div>
+                <div class="result-card" id="wpmCard">WPM: 0</div>
+            </div>
+
+            <button class="btn-action" id="btnNewParagraph" type="button">Đoạn mới</button>
+        </section>
+
+        <aside class="history-panel" aria-label="Lịch sử luyện gõ">
+            <div class="history-header">Lịch sử</div>
+
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th class="history-date-col">Ngày</th>
+                        <th class="history-score-col">Chính xác</th>
+                        <th class="history-score-col">WPM</th>
+                    </tr>
+                </thead>
+            </table>
+
+            <div class="history-list-wrapper">
+                <table class="history-table history-table-body">
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </aside>
+    </main>
+
+    <script src="paragraphs.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
