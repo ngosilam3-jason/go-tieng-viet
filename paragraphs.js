@@ -1,6 +1,6 @@
 window.PARAGRAPHS = [
     {
-        title: "Lão Hạcc",
+        title: "Lão Hạc",
         text: "Lão Hạc thổi cái mồi rơm, châm đốm. Tôi đã thông điếu và đỡ lấy cho lão."
     },
     {

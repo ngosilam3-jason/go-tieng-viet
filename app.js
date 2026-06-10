@@ -112,16 +112,15 @@
 
         state.totalTypedChars = inputValue.length;
 
-        const correctCount = updateCharacterStatus(inputValue);
+        updateCharacterStatus(inputValue);
 
         if (inputValue.length >= state.currentText.length) {
-            endTest(correctCount);
+            endTest();
         }
     }
 
     function updateCharacterStatus(inputValue) {
         const charElements = elements.textDisplay.querySelectorAll(".char-element");
-        let correctCount = 0;
 
         charElements.forEach((span, index) => {
             const expectedChar = state.currentText[index];
@@ -138,13 +137,10 @@
 
             if (typedChar === expectedChar) {
                 span.classList.add("char-correct");
-                correctCount += 1;
             } else {
                 span.classList.add("char-incorrect");
             }
         });
-
-        return correctCount;
     }
 
     function handleTypingKeydown(event) {
@@ -152,17 +148,16 @@
             return;
         }
 
-        const correctCount = elements.textDisplay.querySelectorAll(".char-correct").length;
-        endTest(correctCount);
+        endTest();
     }
 
-    function endTest(correctCount) {
+    function endTest() {
         state.isTyping = false;
         state.isFinished = true;
         elements.typingInput.disabled = true;
 
         const durationInMinutes = getDurationInMinutes();
-        const accuracy = calculateAccuracy(correctCount);
+        const accuracy = calculateAccuracy(elements.typingInput.value);
         const wpm = calculateWpm(durationInMinutes);
 
         elements.typingInput.style.display = "none";
@@ -181,12 +176,21 @@
         return (Date.now() - state.startTime) / 1000 / 60;
     }
 
-    function calculateAccuracy(correctCount) {
-        if (state.totalTypedChars === 0) {
+    function calculateAccuracy(inputValue) {
+        const expectedWords = getWords(state.currentText);
+        const typedWords = getWords(inputValue);
+
+        if (typedWords.length === 0) {
             return 0;
         }
 
-        return Math.round((correctCount / state.totalTypedChars) * 100);
+        const correctWords = typedWords.filter((word, index) => word === expectedWords[index]).length;
+
+        return Math.round((correctWords / typedWords.length) * 100);
+    }
+
+    function getWords(text) {
+        return text.trim().split(" ").filter(Boolean);
     }
 
     function calculateWpm(durationInMinutes) {
@@ -194,7 +198,7 @@
             return 0;
         }
 
-        return Math.round((state.totalTypedChars / 5) / durationInMinutes);
+        return Math.round(getWords(elements.typingInput.value).length / durationInMinutes);
     }
 
     function saveToHistory(accuracy, wpm) {
